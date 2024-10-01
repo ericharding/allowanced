@@ -10,6 +10,10 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
 
+  <ItemGroup Label="files">
+    <EmbeddedResource Include="www/**/*" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="falco" Version="4.0.6" />
     <PackageReference Include="scriban" Version="5.10.0" />
