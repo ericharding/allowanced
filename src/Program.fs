@@ -1,4 +1,5 @@
-﻿open Falco
+﻿namespace Allowanced
+open Falco
 open Falco.Routing
 open Falco.HostBuilder
 open Microsoft.AspNetCore.Http
