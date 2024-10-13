@@ -1,4 +1,4 @@
-﻿namespace Allowanced
+﻿module Allowanced
 open Falco
 open Falco.Routing
 open Falco.HostBuilder

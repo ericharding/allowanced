@@ -1,6 +1,6 @@
-namespace Allowanced
 module Resource
 open Microsoft.Extensions.FileProviders
+open System.IO
 
 // <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 let readEmbeddedFile name =
