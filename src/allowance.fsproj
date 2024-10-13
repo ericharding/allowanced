@@ -1,24 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>allowanced</AssemblyName>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Include="Program.fs" />
     <Compile Include="Resource.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
-
   <ItemGroup Label="files">
     <EmbeddedResource Include="www/**/*" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="falco" Version="4.0.6" />
     <PackageReference Include="scriban" Version="5.10.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>
-
 </Project>

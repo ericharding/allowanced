@@ -5,7 +5,7 @@ open Xunit
 open Allowanced
 
 let util () =
-  Resource.readEmbeddedFile
+  let _ = Resource.readEmbeddedFile
   ignore ref
 
 

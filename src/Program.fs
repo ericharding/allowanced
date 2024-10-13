@@ -31,9 +31,14 @@ let getName (ctx: HttpContext) =
 
 let assembly = config.GetType().Assembly
 
-webHost [||] {
-    endpoints [
-        get "/" (Response.ofPlainText "Hello World!")
-        get "/hello/{name:alpha}" getName 
-    ]
-}
+[<EntryPoint>]
+let main args =
+  webHost [||] {
+      endpoints [
+          get "/" (Response.ofPlainText "Hello World!")
+          get "/hello/{name:alpha}" getName 
+      ]
+  }
+  // Return 0. This indicates success.
+  0 
+
