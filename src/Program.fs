@@ -15,7 +15,7 @@ let renderTemplateFromResource resourceName data =
 
 let renderTemplate (path:string) (data:obj) ctx =
   let path = Path.Combine (config.wwwRoot,path)
-  //todo: async
+  // TODO: async
   let templateText = File.ReadAllText(path)
   let template = Scriban.Template.Parse(templateText)
   let result = template.Render(data)
