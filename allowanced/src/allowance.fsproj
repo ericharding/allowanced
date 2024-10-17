@@ -5,6 +5,8 @@
     <AssemblyName>allowanced</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Model.fs" />
+    <Compile Include="DataStore.fs" />
     <Compile Include="Resource.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -13,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="falco" Version="4.0.6" />
+    <PackageReference Include="microsoft.data.sqlite" Version="8.0.10" />
     <PackageReference Include="scriban" Version="5.10.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>
