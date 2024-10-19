@@ -21,7 +21,7 @@ type Cron = {
 }
 
 let addTask (schedule:TaskSchedule) action (cron:Cron) =
-  cron with scheduledItems = { lastRun = DateTime.MinValue; schedule = schedule; action = action } :: cron.scheduledItems
+  { cron with scheduledItems = {schedule = schedule; lastRun = DateTime.MinValue; action = action} :: cron.scheduledItems }
 
 let checkTimers (time: DateTime) (cron: Cron) =
     let isTaskDue (schedule: TaskSchedule) (lastRun: DateTime) =
