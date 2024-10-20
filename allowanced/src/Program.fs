@@ -24,16 +24,20 @@ let renderTemplate (path:string) (data:obj) ctx =
   Response.ofHtmlString result ctx 
 
 let nameRoute (ctx: HttpContext) =
-    let route = Request.getRoute ctx
-    let name = route.GetString "name"
-    renderTemplate "www/index.html" {| name = name |} ctx
-    // renderTemplateFromResource "www/index.html" {| name = name |} ctx
+  let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
+  let route = Request.getRoute ctx
+  let name = route.GetString "name"
+  let template = fileProvider.getTemplate "index.html"
+  Response.ofHtmlString (template.Render {| name = name |}) ctx
+
+  // renderTemplate "www/index.html" {| name = name |} ctx
+  // renderTemplateFromResource "www/index.html" {| name = name |} ctx
 
 let configureServices (services:IServiceCollection) =
 #if DEBUG
-  services.AddSingleton<IFileProvider>(new LocalFileProvider("www"));
+  services.AddSingleton<IFileProvider>(new LocalFileProvider("www"))
 #else
-  services.AddSingleton<IFileProvider(new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www"))
+  services.AddSingleton<IFileProvider>(new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www"))
 #endif
   // services.Add<IFileProvider>(LocalFileProvider("www"))
 
