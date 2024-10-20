@@ -22,9 +22,17 @@ type Family = {
   name : string
 }
 
+type UserType = 
+  | Adult
+  | Child
+
 type User = {
   id : UserId
   familyId : FamilyId
+  userName : string
+  password : string
+  fullName : string
+  userType : UserType
 }
 
 type AccountType = 
@@ -32,6 +40,7 @@ type AccountType =
   | Spend
   | Give
   | Parent
+  | Other of string
 
 type Account = {
   id : AccountId
