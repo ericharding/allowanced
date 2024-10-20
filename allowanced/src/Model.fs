@@ -24,23 +24,25 @@ type Family = {
 
 type User = {
   id : UserId
-  family : FamilyId
+  familyId : FamilyId
 }
 
 type AccountType = 
-  | Saving
-  | Spending
+  | Save of interest:double
+  | Spend
   | Give
-  | External
+  | Parent
 
 type Account = {
   id : AccountId
   name : string
   owner : UserId
+  accountType : AccountType
 }
 
 type Transaction = {
   id : TransactionId
+  userId : UserId
   timestamp : DateTime
   value : double
 }
@@ -50,13 +52,21 @@ type TransferType =
   | DelayedUntil of DateTime
   | NeedsApproval of UserId
 
+type TransferStatus =
+  | Completed
+  | Pending
+  | NeedsApproval
+
 // A transfer is between accounts
 // The type of the transfer depends on the type of the source and destination
 type Transfer = {
   id : TransferId
   transferType : TransferType
+  transferStatus : TransferStatus
   initiated : DateTime
-  completed : DateTime
+  completed : DateTime option
+  fromAccount : AccountId
+  toAccount : AccountId
   value : double
 }
 
