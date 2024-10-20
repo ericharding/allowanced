@@ -3,8 +3,10 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>allowanced</AssemblyName>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FileProvider.fs" />
     <Compile Include="Cron.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="DataStore.fs" />
@@ -12,7 +14,8 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup Label="files">
-    <EmbeddedResource Include="www/**/*" />
+    <!-- <EmbeddedResource Include="www/**/*" /> -->
+    <EmbeddedResource Include="www/index.html" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="falco" Version="4.0.6" />

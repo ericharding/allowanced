@@ -10,24 +10,26 @@ let config = {|
   wwwRoot = "www"
 |}
 
-let renderTemplateFromResource resourceName data =
-  let content = 2
-  Response.ofPlainText resourceName 
+let renderTemplateFromResource (resourceName:string) (data:obj) ctx =
+  printfn "** %s" resourceName
+  let templateText = Resource.tryReadEmbeddedFile resourceName
+  let template = Scriban.Template.Parse(templateText)
+  let result = template.Render(data)
+  Response.ofHtmlString result ctx
 
 let renderTemplate (path:string) (data:obj) ctx =
   let path = Path.Combine (config.wwwRoot,path)
-  // TODO: async
+  // TODO: use async
   let templateText = File.ReadAllText(path)
   let template = Scriban.Template.Parse(templateText)
   let result = template.Render(data)
   Response.ofHtmlString result ctx 
 
-let getName (ctx: HttpContext) =
+let nameRoute (ctx: HttpContext) =
     let route = Request.getRoute ctx
     let name = route.GetString "name"
-    // let message = sprintf "Hello %s" name
-    // Response.ofPlainText message ctx
-    renderTemplate "index.html" {| name = name |} ctx
+    // renderTemplate "index.html" {| name = name |} ctx
+    renderTemplateFromResource "allowanced/www/index.html" {| name = name |} ctx
 
 let assembly = config.GetType().Assembly
 
@@ -36,7 +38,7 @@ let main args =
   webHost [||] {
       endpoints [
           get "/" (Response.ofPlainText "Hello World!")
-          get "/hello/{name:alpha}" getName 
+          get "/hello/{name:alpha}" nameRoute 
       ]
   }
   // Return 0. This indicates success.
