@@ -9,29 +9,12 @@ open System.IO
 open Microsoft.Extensions.DependencyInjection
 open FileProviders
 
-let renderTemplateFromResource (resourceName:string) (data:obj) ctx =
-  printfn "** %s" resourceName
-  let templateText = Resource.tryReadEmbeddedFile resourceName
-  let template = Scriban.Template.Parse(templateText)
-  let result = template.Render(data)
-  Response.ofHtmlString result ctx
-
-let renderTemplate (path:string) (data:obj) ctx =
-  // TODO: use async
-  let templateText = File.ReadAllText(path)
-  let template = Scriban.Template.Parse(templateText)
-  let result = template.Render(data)
-  Response.ofHtmlString result ctx 
-
 let nameRoute (ctx: HttpContext) =
   let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
   let route = Request.getRoute ctx
-  let name = route.GetString "name"
+  let name = route.GetString ("name", "blank")
   let template = fileProvider.getTemplate "index.html"
   Response.ofHtmlString (template.Render {| name = name |}) ctx
-
-  // renderTemplate "www/index.html" {| name = name |} ctx
-  // renderTemplateFromResource "www/index.html" {| name = name |} ctx
 
 let configureServices (services:IServiceCollection) =
 #if DEBUG

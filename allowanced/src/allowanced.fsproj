@@ -10,7 +10,6 @@
     <Compile Include="Cron.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="DataStore.fs" />
-    <Compile Include="Resource.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup Label="files">
