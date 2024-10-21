@@ -11,7 +11,7 @@
   <ItemGroup>
     <Compile Include="Tests.fs" />
     <Compile Include="CronTests.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="TestMain.fs" />
   </ItemGroup>
 
   <ItemGroup>
