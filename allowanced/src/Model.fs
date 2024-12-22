@@ -29,6 +29,7 @@ type UserType =
 type User = {
   id : UserId
   familyId : FamilyId
+  // family   : Lazy<Family>
   userName : string
   password : string
   fullName : string
@@ -45,7 +46,7 @@ type AccountType =
 type Account = {
   id : AccountId
   name : string
-  owner : UserId
+  userId : UserId
   accountType : AccountType
 }
 

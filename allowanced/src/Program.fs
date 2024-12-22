@@ -22,7 +22,6 @@ let configureServices (services:IServiceCollection) =
 #else
   services.AddSingleton<IFileProvider>(new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www"))
 #endif
-  // services.Add<IFileProvider>(LocalFileProvider("www"))
 
 [<EntryPoint>]
 let main args =
