@@ -6,6 +6,7 @@
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Security.fs" />
     <Compile Include="FileProvider.fs" />
     <Compile Include="Cron.fs" />
     <Compile Include="Model.fs" />

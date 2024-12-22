@@ -23,7 +23,7 @@ type Family = {
 }
 
 type UserType = 
-  | Adult
+  | Parent
   | Child
 
 type User = {
