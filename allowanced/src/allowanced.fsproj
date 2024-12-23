@@ -14,8 +14,9 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup Label="files">
-    <!-- <EmbeddedResource Include="www/**/*" /> -->
-    <EmbeddedResource Include="www/index.html" />
+    <!-- todo: need to move this do a 'dist' if we're generating stylesheets? -->
+    <EmbeddedResource Include="www/**/*.html" />
+    <EmbeddedResource Include="www/styles.css" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="falco" Version="4.0.6" />
