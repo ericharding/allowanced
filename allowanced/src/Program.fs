@@ -10,7 +10,7 @@ open System.IO
 open Microsoft.Extensions.DependencyInjection
 open FileProviders
 
-let inline templateRoute path (dataContext:'a) (ctx:HttpContext) =
+let inline templateRoute path (dataContext:obj) (ctx:HttpContext) =
   let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
   let template = fileProvider.getTemplate path
   Response.ofHtmlString (template.Render dataContext) ctx
