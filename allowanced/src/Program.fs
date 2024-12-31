@@ -10,6 +10,9 @@ open System.IO
 open Microsoft.Extensions.DependencyInjection
 open FileProviders
 
+//
+// Route Helpers
+
 let inline templateRoute path (dataContext:obj) (ctx:HttpContext) =
   let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
   let template = fileProvider.getTemplate path
@@ -19,6 +22,14 @@ let staticRoute path (ctx:HttpContext) =
   let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
   let content = fileProvider.getFileContent path
   Response.ofHtmlString content ctx
+
+let validateCreds username password =
+  match username,password with
+  | Some "admin", Some "password" -> true
+  | _ -> false
+
+//
+// Routes
 
 let nameRoute (ctx: HttpContext) =
   let route = Request.getRoute ctx
@@ -36,10 +47,32 @@ let dashboardRoute (ctx: HttpContext) =
   let template = fileProvider.getTemplate "index.html"
   Response.ofHtmlString (template.Render {||}) ctx
 
-let indexRoute ctx
+let indexRoute : HttpHandler =
   Request.ifAuthenticated dashboardRoute loginRoute
 
+// let logoutRoute : HttpHandler =
+  // Response.removeCookie
 
+type LoginRequest = {
+  username : string
+  password : string
+}
+let loginRoute : HttpHandler =
+  let a = Request.mapForm (fun (form) -> 
+    let username = form.TryGetString "username"
+    let password = form.TryGetString "password"
+    // if validateCreds username password then
+    //   let authCookie = Response.withCookie "auth" username.Value
+    //   authCookie >> Response.redirectTemporarily "/"
+    // else
+    //   Response.withStatusCode 401
+    //   >> Response.ofPlainText "Invalid credentials"
+  )
+  a
+
+
+//
+// Server
 
 let configureServices (services:IServiceCollection) =
 #if DEBUG
@@ -48,15 +81,14 @@ let configureServices (services:IServiceCollection) =
   services.AddSingleton<IFileProvider>(new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www"))
 #endif
 
-// let secureResourc 
-
-
 [<EntryPoint>]
 let main args =
   webHost [||] {
     add_service configureServices
+    use_authentication
     endpoints [
-        get "/" (Response.ofPlainText "Hello World!")
+        get "/" indexRoute
+        post "/login" indexRoute
         get "/hello/{name:alpha}" nameRoute 
     ]
   }
