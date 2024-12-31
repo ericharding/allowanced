@@ -53,22 +53,23 @@ let indexRoute : HttpHandler =
 // let logoutRoute : HttpHandler =
   // Response.removeCookie
 
-type LoginRequest = {
-  username : string
-  password : string
-}
-let loginRoute : HttpHandler =
-  let a = Request.mapForm (fun (form) -> 
-    let username = form.TryGetString "username"
-    let password = form.TryGetString "password"
-    // if validateCreds username password then
-    //   let authCookie = Response.withCookie "auth" username.Value
-    //   authCookie >> Response.redirectTemporarily "/"
-    // else
-    //   Response.withStatusCode 401
-    //   >> Response.ofPlainText "Invalid credentials"
-  )
-  a
+// type LoginRequest = {
+//   username : string
+//   password : string
+// }
+// let loginRoute : HttpHandler =
+//   let a = Request.mapForm (fun (form) -> 
+//     let username = form.TryGetString "username"
+//     let password = form.TryGetString "password"
+//     ()
+//     // if validateCreds username password then
+//     //   let authCookie = Response.withCookie "auth" username.Value
+//     //   authCookie >> Response.redirectTemporarily "/"
+//     // else
+//     //   Response.withStatusCode 401
+//     //   >> Response.ofPlainText "Invalid credentials"
+//   )
+//   a
 
 
 //
