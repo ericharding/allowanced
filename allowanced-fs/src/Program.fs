@@ -42,13 +42,12 @@ let loginRoute (ctx: HttpContext) =
   Response.ofHtmlString (template.Render {||}) ctx
 
 
-let dashboardRoute (ctx: HttpContext) =
-  let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
+let dashboardRoute (fileProvider : IFileProvider) (ctx: HttpContext) =
   let template = fileProvider.getTemplate "index.html"
   Response.ofHtmlString (template.Render {||}) ctx
 
-let indexRoute : HttpHandler =
-  Request.ifAuthenticated dashboardRoute loginRoute
+let indexRoute fileProvider: HttpHandler =
+  Request.ifAuthenticated (dashboardRoute fileProvider) loginRoute
 
 // let logoutRoute : HttpHandler =
   // Response.removeCookie
@@ -75,21 +74,30 @@ let indexRoute : HttpHandler =
 //
 // Server
 
-let configureServices (services:IServiceCollection) =
+
+
+// let configureServices (fileProvider : IFileProvider) (services:IServiceCollection) =
+// #if DEBUG
+//   services.AddSingleton<IFileProvider>(new LocalFileProvider("www"))
+// #else
+//   services.AddSingleton<IFileProvider>(new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www"))
+// #endif
+
+let fileProvider : IFileProvider = 
 #if DEBUG
-  services.AddSingleton<IFileProvider>(new LocalFileProvider("www"))
+ new LocalFileProvider("www")
 #else
-  services.AddSingleton<IFileProvider>(new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www"))
+  new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www")
 #endif
 
 [<EntryPoint>]
 let main args =
   webHost [||] {
-    add_service configureServices
+    add_service (fun s -> s.AddSingleton(fileProvider))
     use_authentication
     endpoints [
-        get "/" indexRoute
-        post "/login" indexRoute
+        get "/" (indexRoute fileProvider)
+        post "/login" (indexRoute fileProvider)
         get "/hello/{name:alpha}" nameRoute 
     ]
   }
