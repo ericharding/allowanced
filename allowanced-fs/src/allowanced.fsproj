@@ -14,7 +14,6 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup Label="files">
-    <!-- todo: need to move this do a 'dist' if we're generating stylesheets? -->
     <EmbeddedResource Include="www/**/*.html" />
     <EmbeddedResource Include="www/styles.css" />
   </ItemGroup>
