@@ -33,14 +33,17 @@ namespace allowanced
       var password = formData["password"];
       if (checkAuth(username, password))
       {
-        var claims = new List<Claim> { new Claim("user", username!) };
+        // ClaimTypes.Name sets the Identity.Name property
+        var claims = new List<Claim> { new Claim(ClaimTypes.Name, username!) };
         var identity = new ClaimsIdentity(claims, "cookie");
         var user = new ClaimsPrincipal(identity);
         await ctx.SignInAsync("cookie", user);
         Console.WriteLine($"Logged in {username} / {password}");
         ctx.Response.Redirect("/");
         return;
-      } else {
+      }
+      else
+      {
         Console.WriteLine($"Invalid password for {username}");
         ctx.Response.Redirect("/login?error=1");
       }
@@ -52,15 +55,19 @@ namespace allowanced
       ctx.Response.Redirect("/");
     }
 
-    public static IResult dashboardRoute(IFileProvider fileProvider) =>
-      Response.htmlFileContent(fileProvider, "home.html");
+    public static Task<IResult> dashboardRoute(HttpContext ctx, IFileProvider fileProvider) =>
+      Response.htmlTemplate(
+        fileProvider,
+        "home.html",
+        new { name = ctx.User.Identity?.Name ?? "Unknown user" }
+      );
 
-    public static IResult indexRoute(HttpContext ctx, IFileProvider fileProvider)
+    public static async Task<IResult> indexRoute(HttpContext ctx, IFileProvider fileProvider)
     {
       var isAuthenticated = ctx.User.Identity?.IsAuthenticated;
       if (isAuthenticated == true)
       {
-        return dashboardRoute(fileProvider);
+        return await dashboardRoute(ctx, fileProvider);
       }
       else
       {
@@ -76,6 +83,7 @@ namespace allowanced
 
       var app = builder.Build();
       app.MapGet("/", indexRoute);
+      app.MapGet("/home", dashboardRoute);
       app.MapGet("/styles.css", styleRoute);
       app.MapGet("/name", nameRoute);
       app.MapGet("/login", loginRoute);
