@@ -6,7 +6,7 @@ using Scriban;
 
 namespace allowanced
 {
-    interface IFileProvider
+    public interface IFileProvider
     {
         string getFileContents(string fileName);
         Scriban.Template getTemplate(string fileName);
