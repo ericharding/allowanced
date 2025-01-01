@@ -15,7 +15,7 @@
   </ItemGroup>
   <ItemGroup Label="files">
     <EmbeddedResource Include="www/**/*.html" />
-    <EmbeddedResource Include="www/styles.css" />
+    <!-- <EmbeddedResource Include="www/styles.css" /> -->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="falco" Version="4.0.6" />
