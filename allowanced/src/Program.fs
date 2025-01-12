@@ -9,17 +9,17 @@ open Microsoft.Extensions.FileProviders
 open System.IO
 open Microsoft.Extensions.DependencyInjection
 open FileProviders
+open System.Security.Claims
+open Microsoft.AspNetCore.Authentication.Cookies
 
 //
 // Route Helpers
 
-let inline templateRoute path (dataContext:obj) (ctx:HttpContext) =
-  let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
+let templateRoute path (fileProvider: IFileProvider) (dataContext:obj) (ctx:HttpContext) =
   let template = fileProvider.getTemplate path
   Response.ofHtmlString (template.Render dataContext) ctx
 
-let staticRoute path (ctx:HttpContext) =
-  let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
+let staticRoute path (fileProvider : IFileProvider) (ctx:HttpContext) =
   let content = fileProvider.getFileContent path
   Response.ofHtmlString content ctx
 
@@ -31,66 +31,81 @@ let validateCreds username password =
 //
 // Routes
 
-let nameRoute (ctx: HttpContext) =
-  let route = Request.getRoute ctx
-  let name = route.GetString ("name", "blank")
-  templateRoute "name.html" {| name = name |} ctx
+let styleRoute = staticRoute "styles.css"
 
-let loginRoute (ctx: HttpContext) =
-  let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
+let loginRoute (fileProvider : IFileProvider) (ctx: HttpContext) =
   let template = fileProvider.getTemplate "login.html"
   Response.ofHtmlString (template.Render {||}) ctx
 
-
-let dashboardRoute (ctx: HttpContext) =
-  let fileProvider = ctx.RequestServices.GetService<IFileProvider>()
-  let template = fileProvider.getTemplate "index.html"
+let dashboardRoute (fileProvider : IFileProvider) (ctx: HttpContext) =
+  let template = fileProvider.getTemplate "home.html"
   Response.ofHtmlString (template.Render {||}) ctx
 
-let indexRoute : HttpHandler =
-  Request.ifAuthenticated dashboardRoute loginRoute
+let createUserClaim username =
+  let claims = [|
+    new Claim(ClaimTypes.Name, username)
+  |]
+  let identity = new ClaimsIdentity(claims, "cookie")
+  let user = new ClaimsPrincipal(identity)
+  user
 
-// let logoutRoute : HttpHandler =
-  // Response.removeCookie
+let indexRoute (fileProvider :IFileProvider) : HttpHandler =
+  Request.ifAuthenticated (dashboardRoute fileProvider) (loginRoute fileProvider)
 
-// type LoginRequest = {
-//   username : string
-//   password : string
-// }
-// let loginRoute : HttpHandler =
-//   let a = Request.mapForm (fun (form) -> 
-//     let username = form.TryGetString "username"
-//     let password = form.TryGetString "password"
-//     ()
-//     // if validateCreds username password then
-//     //   let authCookie = Response.withCookie "auth" username.Value
-//     //   authCookie >> Response.redirectTemporarily "/"
-//     // else
-//     //   Response.withStatusCode 401
-//     //   >> Response.ofPlainText "Invalid credentials"
-//   )
-//   a
+let loginHandler (ctx:HttpContext) =
+  task {
+    let! formData = ctx.Request.ReadFormAsync()
+    let userName = string formData["username"] |> Option.ofObj
+    let password = string formData["password"] |> Option.ofObj
+    if validateCreds userName password then
+      let user = createUserClaim userName.Value
+      printfn $"Logged in {userName.Value} / {password.Value}"
+      return! Response.signInAndRedirect "cookie" user "/" ctx
+    else
+      return! Response.redirectTemporarily "/login?error=1" ctx
+  }
 
+let logoutHandler (ctx:HttpContext) =
+  Response.signOutAndRedirect "cookie" "/" ctx
+  // task {
+  //   do! Auth.signOut "cookie" ctx
+  //   do! Response.redirectTemporarily "/" ctx
+  // }
 
 //
-// Server
+// Services
 
-let configureServices (services:IServiceCollection) =
 #if DEBUG
-  services.AddSingleton<IFileProvider>(new LocalFileProvider("www"))
+let fileProvider = new LocalFileProvider("www")
 #else
-  services.AddSingleton<IFileProvider>(new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www"))
+let fileProvider=new EmbeddedResourceProvider(System.Reflection.Assembly.GetExecutingAssembly(), "allowanced/www")
 #endif
+
+let configureServices (services:IServiceCollection) = 
+  // Note: unclear how to do this with `add_cookie`
+  services
+    .AddAuthentication("cookie")
+    .AddCookie("cookie")
+    |> ignore
+  services
+
+let configureCookie (c:CookieAuthenticationOptions) =
+  ()
 
 [<EntryPoint>]
 let main args =
   webHost [||] {
     add_service configureServices
-    use_authentication
+    // use_authentication
+    // add_cookie "cookie" configureCookie
     endpoints [
-        get "/" indexRoute
-        post "/login" indexRoute
-        get "/hello/{name:alpha}" nameRoute 
+        get "/" (indexRoute fileProvider)
+        get "/login" (loginRoute fileProvider)
+        get "/home" (dashboardRoute fileProvider)
+        get "/styles.css" (styleRoute fileProvider)
+
+        post "/login" (loginHandler >> unbox)
+        get "/logout" logoutHandler
     ]
   }
   // Return 0. This indicates success.
