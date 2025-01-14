@@ -85,12 +85,10 @@ let configureServices (services:IServiceCollection) =
   // Note: unclear how to do this with `add_cookie`
   services
     .AddAuthentication("cookie")
-    .AddCookie("cookie")
+    // Rename the cookie from AspNet. Lets not give away more info than necessary.
+    .AddCookie("cookie", (fun c -> c.Cookie.Name <- "Monster"))
     |> ignore
   services
-
-let configureCookie (c:CookieAuthenticationOptions) =
-  ()
 
 [<EntryPoint>]
 let main args =
