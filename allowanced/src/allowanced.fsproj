@@ -19,8 +19,10 @@
     <EmbeddedResource Include="www/styles.css" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="dapper" Version="2.1.66" />
     <PackageReference Include="falco" Version="4.0.6" />
     <PackageReference Include="microsoft.data.sqlite" Version="8.0.10" />
+    <PackageReference Include="npgsql" Version="9.0.3" />
     <PackageReference Include="scriban" Version="5.10.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>
