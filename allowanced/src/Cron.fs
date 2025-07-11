@@ -1,12 +1,22 @@
 module Cron
 open System
 
+// Design decision.
+// I don't need to persist cron jobs to a database. We know what timers need to run
+// even if they don't have work to do.
+
+[<Struct>]
+type CronValue = Time of int | Star
+
+[<Struct>]
+type CronDayOfWeek = Day of DayOfWeek | Star
+
 type TaskSchedule = {
-  minute : int
-  hour : int
-  dayOfMonth : int
-  month : int
-  dayOfWeek : int
+  minute : CronValue
+  hour : CronValue
+  dayOfMonth : CronValue
+  month : CronValue
+  dayOfWeek : CronDayOfWeek
 }
 
 type ScheduledTask = {
@@ -25,14 +35,12 @@ let addTask (schedule:TaskSchedule) action (cron:Cron) =
 
 let checkTimers (time: DateTime) (cron: Cron) =
     let isTaskDue (schedule: TaskSchedule) (lastRun: DateTime) =
-        let minuteMatch = time.Minute = schedule.minute || schedule.minute = -1
-        let hourMatch = time.Hour = schedule.hour || schedule.hour = -1
-        let dayOfMonthMatch = time.Day = schedule.dayOfMonth || schedule.dayOfMonth = -1
-        let monthMatch = time.Month = schedule.month || schedule.month = -1
-        let dayOfWeekMatch = int time.DayOfWeek = schedule.dayOfWeek || schedule.dayOfWeek = -1
-
+        let minuteMatch = match schedule.minute with Time t -> time.Minute = t | CronValue.Star -> true
+        let hourMatch = match schedule.hour with Time t -> time.Hour = t | CronValue.Star -> true
+        let dayOfMonthMatch = match schedule.dayOfMonth with Time t -> time.Day = t | CronValue.Star -> true
+        let monthMatch = match schedule.month with Time t -> time.Month = t | CronValue.Star -> true
+        let dayOfWeekMatch = match schedule.dayOfWeek with Day t -> time.DayOfWeek = t | CronDayOfWeek.Star -> true
         minuteMatch && hourMatch && dayOfMonthMatch && monthMatch && dayOfWeekMatch
-        && (lastRun.Date < time.Date || (lastRun.Date = time.Date && lastRun.Hour < time.Hour) || (lastRun.Date = time.Date && lastRun.Hour = time.Hour && lastRun.Minute < time.Minute))
 
     let runDueTasks (tasks: ScheduledTask list) =
         tasks
@@ -46,3 +54,4 @@ let checkTimers (time: DateTime) (cron: Cron) =
     { cron with 
         lastChecked = time
         scheduledItems = runDueTasks cron.scheduledItems }
+
