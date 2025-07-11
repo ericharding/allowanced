@@ -11,6 +11,8 @@
     <Compile Include="Cron.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="DataStore.fs" />
+    <Compile Include="PostgresDataStore.fs" />
+    <Compile Include="SqliteDataStore.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup Label="files">
