@@ -6,16 +6,25 @@ open System
 // even if they don't have work to do.
 
 [<Struct>]
-type CronValue = Time of int | Star
+type CronMinute = Minute of int | Any
 
 [<Struct>]
-type CronDayOfWeek = Day of DayOfWeek | Star
+type CronHour = Hour of int | Any
+
+[<Struct>]
+type CronDayOfMonth = DayOfMonth of int | Any
+
+[<Struct>]
+type CronMonth = Month of int | Any
+
+[<Struct>]
+type CronDayOfWeek = Day of DayOfWeek | Any
 
 type TaskSchedule = {
-  minute : CronValue
-  hour : CronValue
-  dayOfMonth : CronValue
-  month : CronValue
+  minute : CronMinute
+  hour : CronHour
+  dayOfMonth : CronDayOfMonth
+  month : CronMonth
   dayOfWeek : CronDayOfWeek
 }
 
@@ -35,12 +44,12 @@ let addTask (schedule:TaskSchedule) action (cron:Cron) =
 
 let checkTimers (time: DateTime) (cron: Cron) =
     let isTaskDue (schedule: TaskSchedule) (lastRun: DateTime) =
-        let minuteMatch = match schedule.minute with Time t -> time.Minute = t | CronValue.Star -> true
-        let hourMatch = match schedule.hour with Time t -> time.Hour = t | CronValue.Star -> true
-        let dayOfMonthMatch = match schedule.dayOfMonth with Time t -> time.Day = t | CronValue.Star -> true
-        let monthMatch = match schedule.month with Time t -> time.Month = t | CronValue.Star -> true
-        let dayOfWeekMatch = match schedule.dayOfWeek with Day t -> time.DayOfWeek = t | CronDayOfWeek.Star -> true
-        minuteMatch && hourMatch && dayOfMonthMatch && monthMatch && dayOfWeekMatch
+        let minuteMatch = match schedule.minute with Minute t -> time.Minute = t | CronMinute.Any -> true
+        let hourMatch = match schedule.hour with Hour t -> time.Hour = t | CronHour.Any -> true
+        let dayOfMonthMatch = match schedule.dayOfMonth with DayOfMonth t -> time.Day = t | CronDayOfMonth.Any -> true
+        let monthMatch = match schedule.month with Month t -> time.Month = t | CronMonth.Any -> true
+        let dayOfWeekMatch = match schedule.dayOfWeek with Day t -> time.DayOfWeek = t | CronDayOfWeek.Any -> true
+        lastRun < time && minuteMatch && hourMatch && dayOfMonthMatch && monthMatch && dayOfWeekMatch
 
     let runDueTasks (tasks: ScheduledTask list) =
         tasks
