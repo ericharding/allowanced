@@ -25,5 +25,6 @@
     <PackageReference Include="npgsql" Version="9.0.3" />
     <PackageReference Include="scriban" Version="5.10.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
+    <PackageReference Include="system.text.json" Version="9.0.7" />
   </ItemGroup>
 </Project>
